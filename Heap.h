@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 // MinPQ
-typedef struct BinaryHeap {
+typedef struct {
     int* data;
     int size;
     int capacity;
@@ -29,8 +29,27 @@ Heap* createMaxHeap(int capacity) {
     return heap;
 }
 
+// heap will be null after closeHeap
+// all resources of heap will be released
+void closeHeap(Heap* heap) {
+    free(heap -> data);
+    free(heap);
+}
+
 int getSize(Heap* heap) {
     return heap -> size;
+}
+
+int getRoot(Heap* heap) {
+    if (!isEmpty(heap))
+        return heap -> data[1];
+    
+    fprintf(stderr, "no root for empty heap\n");
+    return 1;
+}
+
+int isFull(Heap* heap) {
+    return heap -> size == heap -> capacity;
 }
 
 int isEmpty(Heap* heap) {
@@ -85,7 +104,11 @@ void swim(Heap* heap, int index) {
 }
 
 void insert(Heap* heap, int val) {
-    heap -> data[++(heap -> size)] = val;
+    if (!isFull(heap))
+        heap -> data[++(heap -> size)] = val;
+    else // replace the lowest priority one
+        heap -> data[heap -> size] = val;
+
     swim(heap, heap -> size);
 }
 
