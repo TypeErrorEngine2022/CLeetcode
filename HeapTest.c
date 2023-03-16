@@ -9,6 +9,14 @@ void testInsert() {
     print(heap);
 }
 
+void testsort() {
+    int arr[7] = {7,5,3,4,1,6,2};
+    heapSort(arr, 7);
+    for (int i = 0; i < 7; i++) {
+        printf("%d ", arr[i]);
+    }
+}
+
 int main() {
-    testInsert();
+    testsort();
 }

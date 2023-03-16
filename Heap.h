@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // MinPQ
 typedef struct {
@@ -40,6 +41,10 @@ int getSize(Heap* heap) {
     return heap -> size;
 }
 
+int isEmpty(Heap* heap) {
+    return heap -> size == 0;
+}
+
 int getRoot(Heap* heap) {
     if (!isEmpty(heap))
         return heap -> data[1];
@@ -50,10 +55,6 @@ int getRoot(Heap* heap) {
 
 int isFull(Heap* heap) {
     return heap -> size == heap -> capacity;
-}
-
-int isEmpty(Heap* heap) {
-    return heap -> size == 0;
 }
 
 int less(Heap* heap, int i, int j) {
@@ -125,23 +126,67 @@ int delMax(Heap* heap) {
     return max;
 }
 
-int* sort(Heap* heap)
-{
-    int size = heap -> size;
-    // build max-heap : O(n)
-    // second half of data is leaf node(must be heap)
-    // start from data[size / 2], it is root of heap with size 3
-    for (int i = heap -> size / 2; i >= 1; i--)
-    {
+// O(N)
+Heap* heapify(int* arr, int size) {
+    Heap* heap = createMaxHeap(size);
+    int* data = (int*)malloc((size + 1) * sizeof(int));
+    // change 0-indexing to 1-indexing
+    memcpy(data + 1, arr, size * sizeof(int));
+    heap -> data = data;
+    for (int i = size / 2; i >= 1; i++) {
         sink(heap, i);
     }
+    return heap;
+}
 
-    while (size > 1)
+// external arr is 0-indexing
+// so parent = k, children = 2k + 1, 2k + 2
+// find parent = (index - 1) / 2 
+// to avoid (2k + 2) / 2 = k + 1 WRONG
+void _sink(int* arr, int size, int index) {
+    while (2 * index + 1 <= size - 1)
     {
-        delMax(heap);
-    }
+        int j = 2 * index + 1;
 
-    return heap -> data;
+        //choose the larger children to compare with the parent
+        if (j < size - 1 && arr[j] < arr[j + 1])
+        {
+            ++j;
+        }
+        //If it is larger than the largest children, do not sink 
+        if (arr[index] > arr[j])
+        {
+            break;
+        }
+        int tmp = arr[j];
+        arr[j] = arr[index];
+        arr[index] = tmp; 
+        index = j;
+    } 
+}
+
+// for 0-indexing arr
+int _delMax(int* arr, int size) {
+    int tmp = arr[size - 1];
+    arr[size - 1] = arr[0]; 
+    arr[0] = tmp;
+    size--;
+    _sink(arr, size, 0);
+    return size;
+}
+
+// in-place
+void heapSort(int* arr, int size) {
+    // heapify: O(n)
+    // second half of data is leaf node(must be heap)
+    // start from data[size / 2], it is root of heap with size 3
+    for (int index = (size - 1) / 2; index >= 0; index--)
+        _sink(arr, size, index);
+
+    while (size > 0)
+    {
+        size = _delMax(arr, size);
+    }
 }
 
 void print(Heap* heap) {
