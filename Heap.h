@@ -6,7 +6,7 @@
 // MinPQ
 typedef struct {
     int* data;
-    int size;
+    int size; // since the element is 1-indexing, the last element is data[size], not data[size -1]
     int capacity;
     int isMinHeap;
 }Heap;
@@ -106,7 +106,7 @@ void swim(Heap* heap, int index) {
 void insert(Heap* heap, int val) {
     if (!isFull(heap))
         heap -> data[++(heap -> size)] = val;
-    else // replace the lowest priority one
+    else // replace the lowest priority one when full
         heap -> data[heap -> size] = val;
 
     swim(heap, heap -> size);
@@ -115,8 +115,11 @@ void insert(Heap* heap, int val) {
 int delMax(Heap* heap) {
     int max = heap -> data[1];
     //exchange with the last item, since last item has no children
-    //less linindex to breaindex
-    swap(heap, 1, heap -> size--);
+    //less link to break
+    // Also, the oldMax is put in the extra space in array
+    // (heap) | (free space filled with max)
+    // after all elements is deleted, the array is sorted in ascending order
+    swap(heap, 1, (heap -> size)--);
     sink(heap, 1);
 
     return max;
@@ -125,7 +128,9 @@ int delMax(Heap* heap) {
 int* sort(Heap* heap)
 {
     int size = heap -> size;
-    //build max-heap : O(n)
+    // build max-heap : O(n)
+    // second half of data is leaf node(must be heap)
+    // start from data[size / 2], it is root of heap with size 3
     for (int i = heap -> size / 2; i >= 1; i--)
     {
         sink(heap, i);
@@ -133,8 +138,7 @@ int* sort(Heap* heap)
 
     while (size > 1)
     {
-        swap(heap, 1, size--);
-        sink(heap, 1);
+        delMax(heap);
     }
 
     return heap -> data;
