@@ -104,11 +104,10 @@ void swim(Heap* heap, int index) {
     }
 }
 
+// do not address situation when heap is full
 void insert(Heap* heap, int val) {
     if (!isFull(heap))
         heap -> data[++(heap -> size)] = val;
-    else // replace the lowest priority one when full
-        heap -> data[heap -> size] = val;
 
     swim(heap, heap -> size);
 }
