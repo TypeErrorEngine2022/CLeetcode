@@ -25,8 +25,15 @@ ArrayList* createArrayList(int capacity) {
     return list;
 }
 
+void clearArrayList(ArrayList* list) {
+    list -> head = -1;
+    list -> rear = 0;
+    list -> num = 0;
+} 
+
 void reallocate(ArrayList* list, int capacity) {
     if (list -> size < capacity) {
+        // will free original data if not enough space to extend
         int* newData = (int*)realloc(list -> data, capacity * sizeof(int));
         if (newData == NULL) printf("Not enough space\n");
     }
