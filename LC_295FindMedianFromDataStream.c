@@ -36,7 +36,8 @@ double medianFinderFindMedian(MedianFinder* obj) {
 void medianFinderAddNum(MedianFinder* obj, int num) {
     double median;
     // insert to maxHeap first
-    if (getSize(obj -> minHeap) == getSize(obj -> maxHeap) && getSize(obj -> minHeap) == 0) 
+    if (getSize(obj -> minHeap) == getSize(obj -> maxHeap) 
+            && getSize(obj -> minHeap) == 0) 
         median = INT_MAX;
     else 
         median = medianFinderFindMedian(obj);
