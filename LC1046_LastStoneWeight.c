@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "Heap.h"
 
 int solve(int* stones, int stonesSize, int curSize) {
@@ -57,7 +58,7 @@ int solve(int* stones, int stonesSize, int curSize) {
 
 int lastStoneWeight(int* stones, int stonesSize){
     if (stonesSize == 1) return stones[0];
-    Heap* heap = heapify(stones, stonesSize);
+    Heap* heap = heapify(stones, stonesSize, 0);
     while (getSize(heap) > 1) {
         int max1 = delMax(heap);
         int max2 = delMax(heap);
@@ -67,7 +68,7 @@ int lastStoneWeight(int* stones, int stonesSize){
     int res = 0;
     if (getSize(heap) == 1)
         res = getRoot(heap);
-    closeHeap(heap);
+    free(heap);
     return res;
 }
 
