@@ -7,7 +7,7 @@
 // MinPQ
 typedef struct {
     int* data;
-    int size; // since the element is 1-indexing, the last element is data[size], not data[size -1]
+    int size; // since the element is 0-indexing, the last element is data[size - 1]
     int capacity;
     int isMinHeap;
 }Heap;
@@ -16,7 +16,7 @@ Heap* createMinHeap(int capacity) {
     Heap* heap = (Heap*)malloc(sizeof(Heap));
     heap -> size = 0;
     heap -> capacity = capacity;
-    heap -> data = (int*)malloc((capacity + 1) * sizeof(int));
+    heap -> data = (int*)malloc((capacity) * sizeof(int));
     heap -> isMinHeap = 1;
     return heap;
 }
@@ -25,13 +25,14 @@ Heap* createMaxHeap(int capacity) {
     Heap* heap = (Heap*)malloc(sizeof(Heap));
     heap -> size = 0;
     heap -> capacity = capacity;
-    heap -> data = (int*)malloc((capacity + 1) * sizeof(int));
+    heap -> data = (int*)malloc((capacity) * sizeof(int));
     heap -> isMinHeap = 0;
     return heap;
 }
 
 // heap will be null after closeHeap
 // all resources of heap will be released
+// DO NOT use closeheap when the heap is from heapify
 void closeHeap(Heap* heap) {
     free(heap -> data);
     free(heap);
@@ -47,7 +48,7 @@ int isEmpty(Heap* heap) {
 
 int getRoot(Heap* heap) {
     if (!isEmpty(heap))
-        return heap -> data[1];
+        return heap -> data[0];
     
     fprintf(stderr, "no root for empty heap\n");
     return 1;
@@ -77,12 +78,12 @@ void swap(Heap* heap, int i, int j)
 
 void sink(Heap* heap, int index)
 {
-    while (2 * index <= heap -> size)
+    while (2 * index + 1 < heap -> size)
     {
-        int j = 2 * index;
+        int j = 2 * index + 1;
 
         //choose the larger children to compare with the parent
-        if (j < heap -> size && less(heap, j, j + 1))
+        if (j < heap -> size - 1 && less(heap, j, j + 1))
         {
             ++j;
         }
@@ -97,45 +98,45 @@ void sink(Heap* heap, int index)
 }
 
 void swim(Heap* heap, int index) {
-    while (index > 1 && less(heap, index / 2, index))
+    while (index > 0 && less(heap, (index - 1) / 2, index))
     {
-        swap(heap, index / 2, index);
-        index = index / 2;
+        swap(heap, (index - 1) / 2, index);
+        index = (index - 1) / 2;
     }
 }
 
 // do not address situation when heap is full
 void insert(Heap* heap, int val) {
-    if (!isFull(heap))
-        heap -> data[++(heap -> size)] = val;
-
-    swim(heap, heap -> size);
+    if (!isFull(heap)) {
+        heap -> data[heap -> size] = val;
+        heap -> size += 1;
+        swim(heap, heap -> size - 1);
+    }
 }
 
 int delMax(Heap* heap) {
-    int max = heap -> data[1];
+    int max = heap -> data[0];
     //exchange with the last item, since last item has no children
     //less link to break
     // Also, the oldMax is put in the extra space in array
     // (heap) | (free space filled with max)
     // after all elements is deleted, the array is sorted in ascending order
-    swap(heap, 1, (heap -> size)--);
-    sink(heap, 1);
+    swap(heap, 0, heap -> size - 1);
+    heap -> size -= 1;
+    sink(heap, 0);
 
     return max;
 }
 
 // O(N)
-Heap* heapify(int* arr, int size) {
-    Heap* heap = createMaxHeap(size);
-    int* data = (int*)malloc((size + 1) * sizeof(int));
-    // change 0-indexing to 1-indexing
-    memcpy(data + 1, arr, size * sizeof(int));
-    heap -> data = data;
+Heap* heapify(int* arr, int size, int isMinHeap) {
+    Heap* heap = (Heap*)malloc(sizeof(Heap));
+    heap -> data = arr;
+    heap -> capacity = size; 
     heap -> size = size;
-    for (int i = size / 2; i >= 1; i--) {
+    heap -> isMinHeap = isMinHeap;
+    for (int i = (size - 1) / 2; i >= 0; i--)
         sink(heap, i);
-    }
     return heap;
 }
 
@@ -190,7 +191,7 @@ void heapSort(int* arr, int size) {
 }
 
 void print(Heap* heap) {
-    for (int i = 1; i <= heap -> size; i++)
+    for (int i = 0; i <= heap -> size; i++)
     {
         printf("%d ", heap -> data[i]);
     }
