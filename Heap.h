@@ -132,6 +132,7 @@ Heap* heapify(int* arr, int size) {
     // change 0-indexing to 1-indexing
     memcpy(data + 1, arr, size * sizeof(int));
     heap -> data = data;
+    heap -> size = size;
     for (int i = size / 2; i >= 1; i--) {
         sink(heap, i);
     }
