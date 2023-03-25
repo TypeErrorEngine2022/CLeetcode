@@ -5,34 +5,35 @@
 #include <string.h>
 
 typedef struct {
-    int** data; //data[i] = {val, extra info1, extra info2...}
-    int size; // since the element is 1-indexing, the last element is data[size], not data[size -1]
+    int** data; //data[i] = pointer to {val, extra info1, extra info2...}
+    int size; // since the element is 1-indexing, the last element is data[size - 1]
     int capacity;
     int isMinHeap;
+    int elementSize;
 }HeapForArray;
 
-HeapForArray* createMinArrayHeap(int capacity) {
+HeapForArray* createMinArrayHeap(int capacity, int elementSize) {
     HeapForArray* heap = (HeapForArray*)malloc(sizeof(HeapForArray));
     heap -> size = 0;
     heap -> capacity = capacity;
-    heap -> data = (int**)malloc((capacity + 1) * sizeof(int*));
+    heap -> data = (int**)malloc((capacity) * sizeof(int*));
     heap -> isMinHeap = 1;
+    heap -> elementSize = elementSize;
     return heap;
 }
 
-HeapForArray* createMaxArrayHeap(int capacity) {
+HeapForArray* createMaxArrayHeap(int capacity, int elementSize) {
     HeapForArray* heap = (HeapForArray*)malloc(sizeof(HeapForArray));
     heap -> size = 0;
     heap -> capacity = capacity;
-    heap -> data = (int**)malloc((capacity + 1) * sizeof(int*));
+    heap -> data = (int**)malloc((capacity) * sizeof(int*));
+    heap -> elementSize = elementSize;
     heap -> isMinHeap = 0;
     return heap;
 }
 
 // heap will be null after closeHeap
-void closeHeapForArray(HeapForArray* heap) {
-    for (int i = 1; i < heap -> size; i++)
-        free(heap -> data[i]); //free arr
+void closeArrayHeap(HeapForArray* heap) {
     free(heap -> data);
     free(heap);
 }
@@ -47,7 +48,7 @@ int isEmptyForArrayHeap(HeapForArray* heap) {
 
 int* getRootForArrayHeap(HeapForArray* heap) {
     if (!isEmptyForArrayHeap(heap))
-        return heap -> data[1];
+        return heap -> data[0];
     
     fprintf(stderr, "no root for empty heap\n");
     return NULL;
@@ -77,12 +78,12 @@ void swapForArrayHeap(HeapForArray* heap, int i, int j)
 
 void sinkForArrayHeap(HeapForArray* heap, int index)
 {
-    while (2 * index <= heap -> size)
+    while (2 * index + 1 < heap -> size)
     {
-        int j = 2 * index;
+        int j = 2 * index + 1;
 
         //choose the larger children to compare with the parent
-        if (j < heap -> size && lessForArrayHeap(heap, j, j + 1))
+        if (j < heap -> size - 1 && lessForArrayHeap(heap, j, j + 1))
         {
             ++j;
         }
@@ -97,40 +98,43 @@ void sinkForArrayHeap(HeapForArray* heap, int index)
 }
 
 void swimForArrayHeap(HeapForArray* heap, int index) {
-    while (index > 1 && lessForArrayHeap(heap, index / 2, index))
+    while (index > 0 && lessForArrayHeap(heap, (index - 1) / 2, index))
     {
-        swapForArrayHeap(heap, index / 2, index);
-        index = index / 2;
+        swapForArrayHeap(heap, (index - 1) / 2, index);
+        index = (index - 1) / 2;
     }
 }
 
 // do not address situation when heap is full
 void insertForArrayHeap(HeapForArray* heap, int* val) {
-    if (!isFullForArrayHeap(heap))
-        heap -> data[++(heap -> size)] = val;
-
-    swimForArrayHeap(heap, heap -> size);
+    if (!isFullForArrayHeap(heap)) {
+        heap -> data[heap -> size] = val;
+        heap -> size += 1;
+        swimForArrayHeap(heap, heap -> size - 1);
+    }
 }
 
 int* delMaxForArrayHeap(HeapForArray* heap) {
-    int* max = heap -> data[1];
+    int* max = heap -> data[0];
     //exchange with the last item, since last item has no children
     //less link to break
     // Also, the oldMax is put in the extra space in array
     // (heap) | (free space filled with max)
     // after all elements is deleted, the array is sorted in ascending order
-    swapForArrayHeap(heap, 1, (heap -> size)--);
-    sinkForArrayHeap(heap, 1);
-
+    swapForArrayHeap(heap, 0, heap -> size - 1);
+    heap -> size -= 1;
+    sinkForArrayHeap(heap, 0);
     return max;
 }
 
 void printArrayHeap(HeapForArray* heap) {
-    for (int i = 1; i <= heap -> size; i++)
+    for (int i = 0; i < heap -> size; i++)
     {
         printf("(");
-        for (int j = 0; j < 3; j++)
-            printf("%d ", heap -> data[i][j]);
+        for (int j = 0; j < heap -> elementSize; j++) {
+            if (j != 0) printf(", ");
+            printf("%d", heap -> data[i][j]);
+        }
         printf(")");
     }
     printf("\n");
