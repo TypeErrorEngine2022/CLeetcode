@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include "ArrayList.h"
 
 typedef struct {
     int key;
@@ -14,6 +15,7 @@ typedef struct {
     ht_item** items;
     int capacity;
     int size;
+    ArrayList* keySet;
 } HashTableForInt;
 
 typedef struct {
@@ -45,6 +47,7 @@ HashTableForInt* createHashTableForInt(int capacity) {
     memset(table -> items, 0, capacity * sizeof(ht_item*));
     table -> size = 0;
     table -> capacity = capacity;
+    table -> keySet = createArrayList(capacity);
     return table;
 }
 
@@ -54,6 +57,7 @@ void closeHashTableForInt(HashTableForInt* table) {
         free(table -> items[i]);
     }
     free(table -> items);
+    closeArrayList(table -> keySet);
     free(table);
 }
 
@@ -72,7 +76,7 @@ void insertForIntHashTable(HashTableForInt* table, int key, int val) {
     int failureCt = 0;
     while (1) {
         if (failureCt > table -> capacity - 1) {
-            printf("not enough space to store\n");
+            //printf("not enough space to store\n");
             break;
         }
         int index = hashInt(key, failureCt, table -> capacity);
@@ -80,13 +84,14 @@ void insertForIntHashTable(HashTableForInt* table, int key, int val) {
         if (cur == NULL) {
             // does not exist
             if (isFullForHashTable(table)) {
-                printf("Hash table is full\n");
+                //printf("Hash table is full\n");
                 free(item);
                 return;
             }
             //printf("insert successfully at %d\n", index);
             table -> items[index] = item;
             table -> size += 1;
+            push_frontForArrayList(table -> keySet, index);
             break;
         }
         else if (cur -> key == key) {
@@ -103,14 +108,14 @@ int getForIntHashTable(HashTableForInt* table, int key) {
     int failureCt = 0;
     while (1) {
         if (failureCt > table -> capacity - 1) {
-            printf("does not contain element with key %d\n", key);
+            //printf("does not contain element with key %d\n", key);
             return 0;
         }
         int index = hashInt(key, failureCt, table -> capacity);
         ht_item* cur = table -> items[index];
         if (cur == NULL) {
             // does not exist
-            printf("does not contain element with key %d\n", key);
+            //printf("does not contain element with key %d\n", key);
             return 0;
         }
         else if (cur -> key == key) {
@@ -125,14 +130,14 @@ void deleteForIntHashTable(HashTableForInt* table, int key) {
     int failureCt = 0;
     while (1) {
         if (failureCt > table -> capacity - 1) {
-            printf("does not contain element with key %d\n", key);
+            //printf("does not contain element with key %d\n", key);
             break;
         }
         int index = hashInt(key, failureCt, table -> capacity);
         ht_item* cur = table -> items[index];
         if (cur == NULL) {
             // does not exist
-            printf("does not contain element with key %d\n", key);
+            //printf("does not contain element with key %d\n", key);
             return;
         }
         else if (cur -> key == key) {
@@ -158,14 +163,10 @@ void printHashTableForInt(HashTableForInt* table) {
 }
 
 ht_item* nextElement(HashTableForInt* table, HashTableIterator* iter) {
-    int index = iter -> index;
-    for (int i = index; i < table -> capacity; i++) {
-        if (table -> items[i] == NULL) continue;
-        printf("i: %d\n", i);
-        iter -> index = i + 1;
-        iter -> count += 1;
-        return table -> items[i];
-    }
-    return NULL;
+    if (iter -> count > table -> size) return NULL;
+    int index = getKthForArrayList(table -> keySet, iter -> index);
+    iter -> index += 1;
+    iter -> count += 1;
+    return table -> items[index];
 }
 
