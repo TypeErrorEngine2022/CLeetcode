@@ -1,5 +1,4 @@
-#ifndef ARRAYLIST_H
-#define ARRAYLIST_H
+#pragma once
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -32,13 +31,12 @@ void clearArrayList(ArrayList* list) {
 } 
 
 void reallocate(ArrayList* list, int capacity) {
+    int* newData = list -> data;
     if (list -> size < capacity) {
         // will free original data if not enough space to extend
-        int* newData = (int*)realloc(list -> data, capacity * sizeof(int));
+        newData = (int*)realloc(list -> data, capacity * sizeof(int));
         if (newData == NULL) printf("Not enough space\n");
     }
-
-    //printf("reallocating...\n");
     
     list -> data = newData;
     list -> head = -1;
@@ -51,30 +49,37 @@ int getSize(ArrayList* list) {
     return list -> num;
 }
 
-int empty(ArrayList* list) {
+int emptyForArrayList(ArrayList* list) {
     return list -> num == 0;
 }
 
-int isFull(ArrayList* list) {
+int isFullForArrayList(ArrayList* list) {
     return list -> num == list -> size;
 }
 
-int getFront(ArrayList* list) {
-    if (!empty(list)) {
+int getFrontForArrayList(ArrayList* list) {
+    if (!emptyForArrayList(list)) {
         return list -> data[list -> head];
     }
     else return 0;
 }
 
-int getEnd(ArrayList* list) {
-    if (!empty(list)) {
+int getEndForArrayList(ArrayList* list) {
+    if (!emptyForArrayList(list)) {
         return list -> data[list -> rear];
     }
     else return 0;
 }
 
-int push_front(ArrayList* list, int val) {
-    if (!isFull(list)) {
+int getKthForArrayList(ArrayList* list, int k) {
+    if (!emptyForArrayList(list)) {
+        return list -> data[(k + list -> head) % (list -> size)];
+    }
+    return 0;
+}
+
+int push_frontForArrayList(ArrayList* list, int val) {
+    if (!isFullForArrayList(list)) {
         if (list -> head == -1) {
             list -> head = 0;
             list -> rear = 0;
@@ -94,9 +99,9 @@ int push_front(ArrayList* list, int val) {
     else return 0; 
 }
 
-int pop_front(ArrayList* list) {
-    if (!empty(list)) {
-        int val = getFront(list);
+int pop_frontForArrayList(ArrayList* list) {
+    if (!emptyForArrayList(list)) {
+        int val = getFrontForArrayList(list);
         if (list -> head == list -> rear) {
             list -> head = -1;
             list -> rear = -1;
@@ -124,8 +129,8 @@ void printArrayList(ArrayList* list) {
     }
 }
 
-int push_back(ArrayList* list, int val) {
-    if (!isFull(list)) {
+int push_backForArrayList(ArrayList* list, int val) {
+    if (!isFullForArrayList(list)) {
         if (list -> head == -1) {
             list -> head = 0;
             list -> rear = 0;
@@ -148,9 +153,9 @@ int push_back(ArrayList* list, int val) {
     else return 0; 
 }
 
-int pop_back(ArrayList* list) {
-    if (!empty(list)) {
-        int val = getEnd(list);
+int pop_backForArrayList(ArrayList* list) {
+    if (!emptyForArrayList(list)) {
+        int val = getEndForArrayList(list);
         // one element
         if (list -> head == list -> rear) {
             list -> head = -1;
@@ -176,5 +181,3 @@ void closeArrayList(ArrayList* list) {
     free(list -> data);
     free(list);
 }
-
-#endif
