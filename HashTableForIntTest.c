@@ -12,8 +12,8 @@ int main() {
     deleteForIntHashTable(table, 30);
     printHashTableForInt(table);
     HashTableIterator* iter = createHashTableIterator();
-    for (int i = 0; i < 3; i++) {
-        ht_item* item = nextElement(table, iter);
+    while (hasNextForIntHashTable(table)) {
+        ht_item* item = nextElement(table);
         printf("(Key: %d, Val: %d) ", item -> key, item -> val);
     }
     printf("\n");

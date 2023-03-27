@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
-#include "ArrayList.h"
 
 typedef struct {
     int key;
@@ -12,21 +11,21 @@ typedef struct {
 } ht_item;
 
 typedef struct {
+    int index;
+    int hasNext;
+} HashTableIterator;
+
+typedef struct {
     ht_item** items;
     int capacity;
     int size;
-    ArrayList* keySet;
+    HashTableIterator* iter;
 } HashTableForInt;
-
-typedef struct {
-    int index;
-    int count;
-} HashTableIterator;
 
 HashTableIterator* createHashTableIterator() {
     HashTableIterator* iter = (HashTableIterator*)malloc(sizeof(HashTableIterator));
-    iter -> index = 0;
-    iter -> count = 0;
+    iter -> index = -1;
+    iter -> hasNext = 0;
     return iter;
 }
 
@@ -47,7 +46,7 @@ HashTableForInt* createHashTableForInt(int capacity) {
     memset(table -> items, 0, capacity * sizeof(ht_item*));
     table -> size = 0;
     table -> capacity = capacity;
-    table -> keySet = createArrayList(capacity);
+    table -> iter = createHashTableIterator();
     return table;
 }
 
@@ -57,7 +56,6 @@ void closeHashTableForInt(HashTableForInt* table) {
         free(table -> items[i]);
     }
     free(table -> items);
-    closeArrayList(table -> keySet);
     free(table);
 }
 
@@ -69,6 +67,10 @@ unsigned int hashInt(int key, int failureCt, int capacity) {
 
 int isFullForHashTable(HashTableForInt* table) {
     return table -> size == table -> capacity;
+}
+
+int getCount(HashTableForInt* table) {
+    return table -> size;
 }
 
 void insertForIntHashTable(HashTableForInt* table, int key, int val) {
@@ -91,7 +93,6 @@ void insertForIntHashTable(HashTableForInt* table, int key, int val) {
             //printf("insert successfully at %d\n", index);
             table -> items[index] = item;
             table -> size += 1;
-            push_frontForArrayList(table -> keySet, index);
             break;
         }
         else if (cur -> key == key) {
@@ -144,6 +145,7 @@ void deleteForIntHashTable(HashTableForInt* table, int key) {
             free(cur);
             cur = NULL;
             table -> items[index] = NULL;
+            table -> size -= 1;
             return;
         }
         failureCt++;
@@ -162,11 +164,21 @@ void printHashTableForInt(HashTableForInt* table) {
     return;
 }
 
-ht_item* nextElement(HashTableForInt* table, HashTableIterator* iter) {
-    if (iter -> count > table -> size) return NULL;
-    int index = getKthForArrayList(table -> keySet, iter -> index);
-    iter -> index += 1;
-    iter -> count += 1;
-    return table -> items[index];
+int hasNextForIntHashTable(HashTableForInt* table) {
+    HashTableIterator* iter = table -> iter;
+    int hasNext = 0;
+    for (int i = iter -> index + 1; i < table -> capacity; i++) {
+        if (table -> items[i] == NULL) 
+            continue;
+
+        iter -> index = i; // next available element
+        hasNext = 1;
+        break;
+    } 
+    return hasNext;
+}
+
+ht_item* nextElement(HashTableForInt* table) {
+    return table -> items[table -> iter -> index];
 }
 

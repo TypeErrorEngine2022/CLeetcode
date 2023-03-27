@@ -11,14 +11,12 @@ int* topKFrequent(int* nums, int numsSize, int k, int* returnSize){
     for (int i = 0; i < numsSize; i++) {
         insertForIntHashTable(table, nums[i], getForIntHashTable(table, nums[i]) + 1);
     }
-    printHashTableForInt(table);
 
     List** bucket = (List**)malloc((numsSize + 1) * sizeof(List*)); // max freq = size -> arr size = max freq + 1;
     memset(bucket, 0, (numsSize + 1) * sizeof(List*));
-    HashTableIterator* iter = createHashTableIterator();
 
-    while(iter -> count < table -> size) {
-        ht_item* item = nextElement(table, iter);
+    while(hasNextForIntHashTable(table)) {
+        ht_item* item = nextElement(table);
         int freq = item -> val;
         if (bucket[freq] == NULL) 
             bucket[freq] = createList();
@@ -97,7 +95,7 @@ int* topKFrequentSample(int* nums, int numsSize, int k, int* returnSize){
 int main() {
     int arr[6] = {-1, -1};
     int returnSize;
-    int* res = topKFrequentSample(arr, 2, 1, &returnSize);
+    int* res = topKFrequent(arr, 2, 1, &returnSize);
     for (int i = 0; i < returnSize; i++) {
         printf("%d ", res[i]);
     }
