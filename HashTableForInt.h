@@ -29,10 +29,6 @@ HashTableIterator* createHashTableIterator() {
     return iter;
 }
 
-void closeHashTableIterator(HashTableIterator* iter) {
-    free(iter);
-}
-
 ht_item* createHashItem(int key, int val) {
     ht_item* item = (ht_item*)malloc(2 * sizeof(ht_item));
     item -> key = key;
@@ -56,6 +52,7 @@ void closeHashTableForInt(HashTableForInt* table) {
         free(table -> items[i]);
     }
     free(table -> items);
+    free(table -> iter);
     free(table);
 }
 
@@ -164,6 +161,7 @@ void printHashTableForInt(HashTableForInt* table) {
     return;
 }
 
+// will update iter index to index of next available element
 int hasNextForIntHashTable(HashTableForInt* table) {
     HashTableIterator* iter = table -> iter;
     int hasNext = 0;

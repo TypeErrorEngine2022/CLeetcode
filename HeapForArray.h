@@ -17,6 +17,7 @@ HeapForArray* createMinArrayHeap(int capacity, int elementSize) {
     heap -> size = 0;
     heap -> capacity = capacity;
     heap -> data = (int**)malloc((capacity) * sizeof(int*));
+    memset(heap -> data, 0, capacity * sizeof(int*));
     heap -> isMinHeap = 1;
     heap -> elementSize = elementSize;
     return heap;
@@ -27,12 +28,14 @@ HeapForArray* createMaxArrayHeap(int capacity, int elementSize) {
     heap -> size = 0;
     heap -> capacity = capacity;
     heap -> data = (int**)malloc((capacity) * sizeof(int*));
+    memset(heap -> data, 0, capacity * sizeof(int*));
     heap -> elementSize = elementSize;
     heap -> isMinHeap = 0;
     return heap;
 }
 
 // heap will be null after closeHeap
+// FREE the arr by creator
 void closeArrayHeap(HeapForArray* heap) {
     free(heap -> data);
     free(heap);
@@ -52,6 +55,10 @@ int* getRootForArrayHeap(HeapForArray* heap) {
     
     fprintf(stderr, "no root for empty heap\n");
     return NULL;
+}
+
+int** getDataForArrayHeap(HeapForArray* heap) {
+    return heap -> data;
 }
 
 int isFullForArrayHeap(HeapForArray* heap) {

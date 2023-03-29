@@ -1,4 +1,27 @@
-#include <stdio.h>
+struct ListNode* reverseList(struct ListNode* head){
+	struct ListNode* prev = NULL;
+	struct ListNode* cur = head;
+	struct ListNode* next = NULL;
+	while (cur != NULL) {
+		next = cur -> next;
+		cur -> next = prev;
+		prev = cur;
+		cur = next;
+	}
+	return prev;
+}
+
+// return the index of target
+// input array must be sorted
+int binarySearch(int* arr, int l, int r, int target) {
+	int mid = l + (r - 1) / 2;
+	if (arr[mid] == target)
+		return target;
+	else if (arr[mid] > target) 
+		return binarySearch(arr, l, r - 1, target);
+	
+	return binarySearch(arr, mid + 1, r, target);
+}
 
 void swap(int* arr, int i, int j) {
     int tmp = arr[i];
@@ -53,15 +76,20 @@ int quickSelect(int* arr, int arrSize, int k) {
             r = pivot - 1;
     }
     return pivot;
-}
+}            
 
-int main() {
-    int arr[6] = {4, 2, 6, 1, 3, 5};
-    printf("2-th largest is %d\n", arr[quickSelect(arr, 6, 2)]);
-    for (int i = 0; i < 6; i++) {
-        printf("%d ", arr[i]);
-    }
-    return 0;
+// if len == even, return the second node in middle
+// eg. 1 -> 2 -> 2 -> 4 will return the second 2
+// if we need first 2
+// change the while condition to
+// while (fast -> next != NULL && fast -> next -> next != NULL) 
+// so that fast will have one less step 
+struct ListNode* middleNode(struct ListNode* head){
+	struct ListNode* slow = head;
+	struct ListNode* fast = head;
+	while (fast != NULL && fast -> next != NULL) {
+		slow = slow -> next;
+		fast = fast -> next -> next;
+	}
+	return slow;
 }
-
-    

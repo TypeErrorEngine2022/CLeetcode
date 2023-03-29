@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "HashTableForInt.h"
 #include "LinkedList.h"
+#include "HeapForArray.h"
 
 int* topKFrequent(int* nums, int numsSize, int k, int* returnSize){
     *returnSize = k;
@@ -32,6 +33,13 @@ int* topKFrequent(int* nums, int numsSize, int k, int* returnSize){
             res[sz++] = pop_front(bucket[i]);
         }
     }
+
+    closeHashTableForInt(table);
+    for (int i = 0; i < numsSize + 1; i++) {
+        if (bucket[i] != NULL)
+            closeList(bucket[i]);
+    }
+    free(bucket);
             
     return res; 
 }
@@ -92,10 +100,51 @@ int* topKFrequentSample(int* nums, int numsSize, int k, int* returnSize){
     return res;
 }
 
+int* topKFrequentUsingHeap(int* nums, int numsSize, int k, int* returnSize){
+    *returnSize = k;
+    int* res = (int*)malloc(k * sizeof(int));
+    memset(res, 0, k * sizeof(int));
+    HashTableForInt* table = createHashTableForInt(numsSize * 1.7);
+
+    for (int i = 0; i < numsSize; i++) {
+        insertForIntHashTable(table, nums[i], getForIntHashTable(table, nums[i]) + 1);
+    }
+
+    HeapForArray* heap = createMinArrayHeap(k + 1, 2);
+
+    while (hasNextForIntHashTable(table)) {
+        ht_item* item = nextElement(table);
+        int freq = item -> val;
+        int num = item -> key;
+        int* arr = (int*)malloc(2 * sizeof(int));
+        arr[0] = freq;
+        arr[1] = num;
+        insertForArrayHeap(heap, arr);
+        if (getSizeForArrayHeap(heap) > k) {
+            int* arr = delMaxForArrayHeap(heap);
+            free(arr);
+        }
+    }
+
+    int** data = getDataForArrayHeap(heap);
+    for (int i = 0; i < k; i++) {
+        res[i] = data[i][1];
+    }
+
+    for (int i = 0; i < k; i++) {
+        free(data[i]);
+    }
+    closeArrayHeap(heap);
+    closeHashTableForInt(table);
+
+    return res;
+}
+
+
 int main() {
     int arr[6] = {-1, -1};
     int returnSize;
-    int* res = topKFrequent(arr, 2, 1, &returnSize);
+    int* res = topKFrequentUsingHeap(arr, 2, 1, &returnSize);
     for (int i = 0; i < returnSize; i++) {
         printf("%d ", res[i]);
     }
