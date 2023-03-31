@@ -93,3 +93,8 @@ struct ListNode* middleNode(struct ListNode* head){
 	}
 	return slow;
 }
+
+// retrun the max value
+int max(int a, int b) {
+	return (a >= b)? a: b;
+}

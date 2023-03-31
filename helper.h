@@ -10,3 +10,4 @@ int quickSelect(int* arr, int arrSize, int k);
 
 struct ListNode* middleNode(struct ListNode* head);
 	
+int max(int a, int b);

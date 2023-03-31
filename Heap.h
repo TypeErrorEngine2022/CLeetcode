@@ -140,6 +140,20 @@ Heap* heapify(int* arr, int size, int isMinHeap) {
     return heap;
 }
 
+Heap* heapifyWithCopy(int* arr, int size, int isMinHeap) {
+    Heap* heap = (Heap*)malloc(sizeof(Heap));
+		int* data = (int*)malloc(size * sizeof(int));
+		memcpy(data, arr, size * sizeof(int));
+    heap -> data = data;
+    heap -> capacity = size; 
+    heap -> size = size;
+    heap -> isMinHeap = isMinHeap;
+    for (int i = (size - 1) / 2; i >= 0; i--)
+        sink(heap, i);
+		print(heap);
+    return heap;
+}
+
 // external arr is 0-indexing
 // so parent = k, children = 2k + 1, 2k + 2
 // find parent = (index - 1) / 2 
@@ -191,7 +205,7 @@ void heapSort(int* arr, int size) {
 }
 
 void print(Heap* heap) {
-    for (int i = 0; i <= heap -> size; i++)
+    for (int i = 0; i < heap -> size; i++)
     {
         printf("%d ", heap -> data[i]);
     }

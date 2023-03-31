@@ -45,11 +45,11 @@ void reallocate(ArrayList* list, int capacity) {
     list -> size = capacity;
 }
 
-int getSize(ArrayList* list) {
+int getSizeForArrayList(ArrayList* list) {
     return list -> num;
 }
 
-int emptyForArrayList(ArrayList* list) {
+int isEmptyForArrayList(ArrayList* list) {
     return list -> num == 0;
 }
 
@@ -58,21 +58,21 @@ int isFullForArrayList(ArrayList* list) {
 }
 
 int getFrontForArrayList(ArrayList* list) {
-    if (!emptyForArrayList(list)) {
+    if (!isEmptyForArrayList(list)) {
         return list -> data[list -> head];
     }
     else return 0;
 }
 
 int getEndForArrayList(ArrayList* list) {
-    if (!emptyForArrayList(list)) {
+    if (!isEmptyForArrayList(list)) {
         return list -> data[list -> rear];
     }
     else return 0;
 }
 
 int getKthForArrayList(ArrayList* list, int k) {
-    if (!emptyForArrayList(list)) {
+    if (!isEmptyForArrayList(list)) {
         return list -> data[(k + list -> head) % (list -> size)];
     }
     return 0;
@@ -100,7 +100,7 @@ int push_frontForArrayList(ArrayList* list, int val) {
 }
 
 int pop_frontForArrayList(ArrayList* list) {
-    if (!emptyForArrayList(list)) {
+    if (!isEmptyForArrayList(list)) {
         int val = getFrontForArrayList(list);
         if (list -> head == list -> rear) {
             list -> head = -1;
@@ -113,9 +113,7 @@ int pop_frontForArrayList(ArrayList* list) {
         else {
             (list -> head)++;
         }
-        //printf("list -> head is %d\n", list -> head);
-        /*list -> head = (list -> head + 1) % (list -> size); // mod
-        if (list -> head < 0) list -> head *= -1;*/
+        
         (list -> num)--;
         return val;
     } 
@@ -144,8 +142,7 @@ int push_backForArrayList(ArrayList* list, int val) {
         else {
             (list -> rear)++;
         }
-        /**list -> rear = (list -> rear + 1) % (list -> size); // mod
-        if (list -> rear < 0) list -> rear *= -1;*/
+        
         list -> data[list -> rear] = val;
         (list -> num)++;
         return 1;
@@ -154,7 +151,7 @@ int push_backForArrayList(ArrayList* list, int val) {
 }
 
 int pop_backForArrayList(ArrayList* list) {
-    if (!emptyForArrayList(list)) {
+    if (!isEmptyForArrayList(list)) {
         int val = getEndForArrayList(list);
         // one element
         if (list -> head == list -> rear) {
@@ -168,8 +165,7 @@ int pop_backForArrayList(ArrayList* list) {
         else {
             (list -> rear)--;
         }
-        /*list -> rear = (list -> rear - 1) % (list -> size); // mod
-        if (list -> rear < 0) list -> head *= -1;*/
+        
         (list -> num)--;
         return val;
     } 
