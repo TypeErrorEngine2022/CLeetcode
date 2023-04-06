@@ -98,3 +98,7 @@ struct ListNode* middleNode(struct ListNode* head){
 int max(int a, int b) {
 	return (a >= b)? a: b;
 }
+
+int compfunc(const void* a, const void* b) {
+	return (*(int*)a >= *(int*)b);
+}
